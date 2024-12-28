@@ -79,7 +79,7 @@ public class ExcelController {
 		}
 
 		try {
-			logger.info("解析EXCEL");
+			logger.info("解析EXCEL...");
 
 			//解析Excel
 			excelUploadService.processExcelFile(file);
