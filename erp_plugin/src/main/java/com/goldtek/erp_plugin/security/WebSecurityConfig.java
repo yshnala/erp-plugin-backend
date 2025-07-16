@@ -36,7 +36,7 @@ public class WebSecurityConfig {
 		
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        
+    	   System.out.println("12313132");
 
     	
     	

@@ -24,7 +24,7 @@ public class ExcelDowloadService {
 
             // 創建標題行
             Row headerRow = sheet.createRow(0);
-            String[] headers = {"ID", "Name", "Email"};
+            String[] headers = {"CustomerNo", "ItemNo", "CustomerItem"};
             for (int i = 0; i < headers.length; i++) {
                 Cell cell = headerRow.createCell(i);
                 cell.setCellValue(headers[i]);

@@ -1,6 +1,7 @@
 package com.goldtek.erp_plugin.controller;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.goldtek.erp_plugin.service.ExcelUploadService;
+import com.goldtek.erp_plugin.api.entity.CustomerItemData;
+import com.goldtek.erp_plugin.api.service.CustomerItemService;
 import com.goldtek.erp_plugin.service.ExcelDowloadService;
+import com.goldtek.erp_plugin.service.ExcelUploadService;
 
 /**
  * 
@@ -34,8 +37,9 @@ public class ExcelController {
 	
 	@Autowired
 	ExcelUploadService excelUploadService;
-
 	
+	@Autowired
+	CustomerItemService customerItemService;
 	/**
 	 * 
 	 * 方法名: exportCustomerPartNoExcel
@@ -49,6 +53,8 @@ public class ExcelController {
 	 */
 	@GetMapping("export/sample/customerPartNoMapping")
 	public ResponseEntity<Object> exportCustomerPartNoExcel() {
+		System.out.println("下載檔案.......");
+		logger.info("下載檔案.......");
 		try {
 			byte[] excelData = excelDowloadService.generateExcel();
 
@@ -57,7 +63,7 @@ public class ExcelController {
 			headersResponse.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=sample.xlsx");
 			headersResponse.add(HttpHeaders.CONTENT_TYPE,
 					"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-
+			
 			return new ResponseEntity<>(excelData, headersResponse, HttpStatus.OK);
 		} catch (IOException e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
@@ -83,9 +89,16 @@ public class ExcelController {
 			logger.info("解析EXCEL...");
 
 			//解析Excel
-			excelUploadService.processExcelFile(file);
+			List<CustomerItemData> list = excelUploadService.processExcelFile(file);
+			
+			//先檢查有沒有重複的庫戶料號+客戶+料號，有的話不繼續
+			
+			customerItemService.create(list);
 			//上傳FTP
 			//儲存ERP DB
+			customerItemService.getCreateRequest(list);
+			
+			
 //			throw new RuntimeException("TEST");
 			return ResponseEntity.ok("File uploaded and logged successfully");
 		} catch (Exception e) {
